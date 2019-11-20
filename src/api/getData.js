@@ -7,10 +7,17 @@ import fetch from '@/config/fetch'
 export const login = data => fetch('/admin/login', data, 'POST');
 
 /**
+ * 注册
+ */
+
+export const register = data => fetch('/admin/register', data, 'POST');
+
+
+/**
  * 退出
  */
 
-export const signout = () => fetch('/admin/signout');
+export const singout = () => fetch('/admin/singout');
 
 /**
  * 获取用户信息

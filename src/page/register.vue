@@ -3,28 +3,31 @@
 	  	<transition name="form-fade" mode="in-out">
 	  		<section class="form_contianer" v-show="showLogin">
 		  		<div class="manage_tip">
-		  			<p>商铺后台管理系统</p>
+		  			<p>elm后台管理系统</p>
 		  		</div>
-		    	<el-form :model="loginForm" :rules="rules" ref="loginForm">
+		    	<el-form :model="loginForm" :rules="rules" ref="registerForm">
 					<el-form-item prop="username">
 						<el-input v-model="loginForm.username" placeholder="用户名"></el-input>
 					</el-form-item>
 					<el-form-item prop="password">
-						<el-input type="password" placeholder="密码" v-model="loginForm.password"></el-input>
+						<el-input type="password" placeholder="新密码" v-model="loginForm.password"></el-input>
 					</el-form-item>
+                    <el-form-item prop="confirm_password">
+                        <el-input type="password" placeholder="确认密码" v-model="loginForm.confirm_password"></el-input>
+                    </el-form-item>
 					<el-form-item>
-                       <!-- <el-button type="primary" @click="registerUser()" class="submit_btn">注册</el-button>-->
-				    	<el-button type="primary" @click="submitForm('loginForm')" class="submit_btn">登陆</el-button>
+				    	<el-button type="primary" @click="submitForm('registerForm')" class="submit_btn">注册</el-button>
 				  	</el-form-item>
 				</el-form>
+				<p class="tip">温馨提示：</p>
+				<p class="tip">建议用户密码为8-12位字母、数字、特殊字符组成</p>
 	  		</section>
-	  	</transition>si
+	  	</transition>
   	</div>
 </template>
 
 <script>
-	import {login, getAdminInfo} from '@/api/getData'
-	import {mapActions, mapState} from 'vuex'
+	import {register} from '@/api/getData'
 
 	export default {
 	    data(){
@@ -32,6 +35,7 @@
 				loginForm: {
 					username: '',
 					password: '',
+                    confirm_password:''
 				},
 				rules: {
 					username: [
@@ -40,31 +44,27 @@
 					password: [
 						{ required: true, message: '请输入密码', trigger: 'blur' }
 					],
+                    confirm_password: [
+                        { required: true, message: '请确认密码', trigger: 'blur' }
+                    ]
 				},
 				showLogin: false,
 			}
 		},
 		mounted(){
 			this.showLogin = true;
-			if (!this.adminInfo.id) {
-    			this.getAdminData()
-    		}
-		},
-		computed: {
-			...mapState(['adminInfo']),
 		},
 		methods: {
-			...mapActions(['getAdminData']),
 			async submitForm(formName) {
 				this.$refs[formName].validate(async (valid) => {
 					if (valid) {
-						const res = await login({user_name: this.loginForm.username, password: this.loginForm.password})
+						const res = await register({user_name: this.loginForm.username, password: this.loginForm.password, confirm_password: this.loginForm.confirm_password})
 						if (res.status == 1) {
 							this.$message({
 		                        type: 'success',
-		                        message: '登录成功'
+		                        message: '注册成功'
 		                    });
-							this.$router.push('manage');
+							this.$router.push('manage')
 						}else{
 							this.$message({
 		                        type: 'error',
@@ -81,21 +81,7 @@
 					}
 				});
 			},
-            async registerUser(){
-                this.$router.push('register');
-            }
 		},
-		watch: {
-			adminInfo: function (newValue){
-				if (newValue.id) {
-					this.$message({
-                        type: 'success',
-                        message: '检测到您之前登录过，将自动登录'
-                    });
-					this.$router.push('manage')
-				}
-			}
-		}
 	}
 </script>
 
@@ -122,7 +108,7 @@
 		text-align: center;
 		background-color: #fff;
 		.submit_btn{
-			width: 40%;
+			width: 100%;
 			font-size: 16px;
 		}
 	}
